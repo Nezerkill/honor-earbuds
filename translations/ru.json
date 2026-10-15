@@ -1,24 +1,44 @@
 {
-  "panel.title": "Honor Earbuds",
-  "panel.status.connected": "Подключено",
-  "panel.status.disconnected": "Отключено",
-  "panel.left": "Левый",
-  "panel.right": "Правый",
-  "panel.case": "Кейс",
-  "panel.charging": "Зарядка",
-  "panel.noise_control": "ШУМОПОДАВЛЕНИЕ",
-  "panel.mode.anc": "Шумоподавление",
-  "panel.mode.transparency": "Прозрачность",
-  "panel.mode.off": "Обычный (Выкл)",
-  "widget.mode": "Режим",
-  "widget.not_connected": "Наушники не подключены",
-  "widget.action.left_click": "Открыть панель",
-  "widget.action.right_click": "Переключить ANC",
-  "notify.mode_changed": "Режим ANC: %s",
-  "settings.device_mac.label": "MAC-адрес устройства",
-  "settings.device_mac.description": "Переопределить Bluetooth MAC-адрес (опционально, определяется автоматически)",
-  "settings.hide_when_disconnected.label": "Скрывать при отключении",
-  "settings.hide_when_disconnected.description": "Скрывать виджет на панели, когда наушники отключены",
-  "settings.notify_on_connect.label": "Уведомление при подключении",
-  "settings.notify_on_connect.description": "Показывать всплывающее уведомление с зарядом батареи при подключении наушников"
+  "panel": {
+    "title": "Honor Earbuds",
+    "status": {
+      "connected": "Подключено",
+      "disconnected": "Отключено"
+    },
+    "left": "Левый",
+    "right": "Правый",
+    "case": "Кейс",
+    "charging": "Зарядка",
+    "noise_control": "ШУМОПОДАВЛЕНИЕ",
+    "mode": {
+      "anc": "Шумоподавление",
+      "transparency": "Прозрачность",
+      "off": "Обычный (Выкл)"
+    }
+  },
+  "widget": {
+    "mode": "Режим",
+    "not_connected": "Наушники не подключены",
+    "action": {
+      "left_click": "Открыть панель",
+      "right_click": "Переключить ANC"
+    }
+  },
+  "notify": {
+    "mode_changed": "Режим ANC: %s"
+  },
+  "settings": {
+    "device_mac": {
+      "label": "MAC-адрес устройства",
+      "description": "Переопределить Bluetooth MAC-адрес (опционально, определяется автоматически)"
+    },
+    "hide_when_disconnected": {
+      "label": "Скрывать при отключении",
+      "description": "Скрывать виджет на панели, когда наушники отключены"
+    },
+    "notify_on_connect": {
+      "label": "Уведомление при подключении",
+      "description": "Показывать всплывающее уведомление с зарядом батареи при подключении наушников"
+    }
+  }
 }
