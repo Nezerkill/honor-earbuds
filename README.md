@@ -1,135 +1,134 @@
-# Honor Earbuds Plugin для Noctalia Shell v5
+# Honor Earbuds Plugin for Noctalia Shell v5
 
-Интеграция TWS-наушников серии **HONOR CHOICE** в окружение [Noctalia Shell v5](https://noctalia.dev).
+[🇬🇧 English](README.md) | [🇷🇺 Русский](README.ru.md)
 
-Плагин позволяет управлять режимами активного шумоподавления (ANC), отслеживать заряд каждого наушника и кейса в реальном времени, а также получать всплывающие уведомления при подключении.
+Integration of **HONOR CHOICE** series TWS earbuds into [Noctalia Shell v5](https://noctalia.dev).
+
+This plugin provides Active Noise Cancellation (ANC) control, real-time battery monitoring for each earbud and the charging case, and connection toast notifications.
 
 ---
 
-## 🎧 Поддерживаемые модели
+## 🎧 Supported Models
 
-Плагин взаимодействует с наушниками через протокол **Bestechnic (BES) RFCOMM SPP** (каналы 18 / 12) — тот же протокол, что используется мобильным приложением **Honor AI Space**:
+The plugin communicates with the earbuds using the **Bestechnic (BES) RFCOMM SPP** protocol (channels 18 / 12) — the same protocol utilized by the mobile **Honor AI Space** app:
 
-| Модель | Статус поддержки | Особенности |
+| Model | Support Status | Notes |
 |---|---|---|
-| **HONOR CHOICE Earbuds X5** | 🟢 **100% протестировано** | ANC (Шумоподавление / Прозрачность / Выкл), точный заряд (L/R/Case) |
-| **HONOR CHOICE Earbuds X5 Pro** | 🟢 **Полная совместимость** | ANC, батарея, эквалайзер |
-| **HONOR CHOICE Earbuds X3 / X3 Lite** | 🟢 **Полная совместимость** | ANC, батарея |
-| **HONOR CHOICE Earbuds X / X2** | 🟢 **Совместимо** | Батарея, управление |
-| **Moecen TWS (OEM Honor Choice)** | 🟢 **Совместимо** | Базовый протокол Bestechnic |
-
-> [!NOTE]
-> Флагманские модели *HONOR Earbuds 2 Lite / 3 Pro*, а также линейки *Huawei FreeBuds*, *Sony*, *AirPods* и *Pixel Buds* используют другие проприетарные протоколы и данным плагином не поддерживаются.
+| **HONOR CHOICE Earbuds X5** | 🟢 **100% Tested** | ANC (Noise Cancellation / Awareness / Off), accurate battery (L/R/Case) |
+| **HONOR CHOICE Earbuds X5 Pro** | 🟢 **Full Compatibility** | ANC, battery, hardware EQ |
+| **HONOR CHOICE Earbuds X3 / X3 Lite** | 🟢 **Full Compatibility** | ANC, battery |
+| **HONOR CHOICE Earbuds X / X2** | 🟢 **Compatible** | Battery, playback controls |
+| **Moecen TWS (OEM Honor Choice)** | 🟢 **Compatible** | Standard Bestechnic protocol |
 
 ---
 
-## ✨ Возможности
+## ✨ Features
 
-- **Виджет в статус-баре:**
-  - Динамическая иконка наушников и средний процент заряда.
-  - Тултип с подробным статусом и подсказками по управлению.
-  - Опция скрытия виджета при отключении наушников.
-- **Интерактивное управление:**
-  - **ЛКМ** по виджету — открытие выпадающей панели управления.
-  - **ПКМ** по виджету — циклическое переключение режимов шумоподавления:  
-    `Шумоподавление (ANC)` ➔ `Прозрачность (Awareness)` ➔ `Обычный (Off)`.
-- **Выпадающая панель (Panel):**
-  - Раздельные шкалы уровня заряда для **левого**, **правого** наушника и **кейса**.
-  - Индикация зарядки каждого элемента (⚡).
-  - Индикация низкого уровня заряда (красный цвет при ≤ 20%).
-  - Кнопки быстрого переключения режимов ANC с цветовым выделением активного режима.
-  - Кнопка принудительного обновления статуса.
-- **Всплывающие уведомления (Toasts / OSD):**
-  - Автоматическое уведомление при подключении наушников с текущим зарядом всех компонентов.
-  - Уведомление при переключении режима ANC.
-- **Быстрый бэкенд:**
-  - Моментальное определение статуса соединения через `bluetoothctl` (~7 мс) без зависаний сокетов при отключенных наушниках.
-- **Автономная CLI-утилита (`honor-anc`):**
-  - Управление через терминал и бинды в Hyprland / Sway.
+- **Status Bar Widget:**
+  - Dynamic headphones glyph and average battery level percentage.
+  - Informative tooltip showing connection details and click hints.
+  - Option to hide the widget when earbuds are disconnected.
+- **Interactive Controls:**
+  - **Left-Click** on widget — open dropdown control panel.
+  - **Right-Click** on widget — cycle ANC modes:  
+    `Noise Cancellation (ANC)` ➔ `Awareness (Transparency)` ➔ `Off (Normal)`.
+- **Dropdown Panel:**
+  - Independent battery progress bars for **Left**, **Right** earbuds, and the **Case**.
+  - Low battery warning indication (highlighted in red when ≤ 20%).
+  - Quick-switch buttons for ANC modes with visual highlighting of the active mode.
+  - Manual refresh button.
+- **Toast Notifications (OSD):**
+  - Automatic popup notification upon connecting earbuds with current battery levels.
+  - OSD alert when switching ANC modes.
+- **Fast Backend:**
+  - Ultra-fast connection state checks via `bluetoothctl` (~7 ms) preventing socket timeouts and system freezes when earbuds are powered off.
+- **Standalone CLI Utility (`honor-anc`):**
+  - Terminal control and keybind integration for Hyprland, Sway, and script automation.
 
 ---
 
-## 📁 Структура плагина
+## 📁 Plugin Structure
 
 ```text
 honor-earbuds/
-├── plugin.toml            # Декларация плагина, настройки, размеры панели и виджета
-├── widget.luau            # Виджет для статус-бара Noctalia
-├── panel.luau             # Выпадающее окно управления и мониторинга батареи
-├── service.luau           # Фоновый сервис: опрос статуса, IPC, уведомления
+├── plugin.toml            # Plugin manifest, declared settings, panel and widget geometry
+├── widget.luau            # Status bar widget for Noctalia
+├── panel.luau             # Dropdown control panel & battery monitor
+├── service.luau           # Background daemon: state polling, IPC dispatch, notifications
 ├── scripts/
-│   └── honor_ctl.py       # Быстрый контроллер (RFCOMM + bluetoothctl JSON)
+│   ├── honor_ctl.py       # Fast JSON controller (RFCOMM + bluetoothctl)
+│   └── honor-earbuds.py   # Standalone CLI honor-anc tool
 └── translations/
-    ├── ru.json            # Русская локализация
-    └── en.json            # Английская локализация
+    ├── ru.json            # Russian localization
+    └── en.json            # English localization
 ```
 
 ---
 
-## ⚙️ Настройки
+## ⚙️ Settings
 
-Настройки доступны через стандартный графический интерфейс настроек Noctalia Shell либо в конфигурации:
+Settings are accessible through Noctalia Shell's graphical settings window or can be configured directly:
 
-| Параметр | Ключ | Тип | По умолчанию | Описание |
+| Setting | Key | Type | Default | Description |
 |---|---|---|---|---|
-| **Уведомление при подключении** | `notify_on_connect` | `bool` | `true` | Показывать всплывающее уведомление с зарядом батареи при подключении |
-| **Скрывать при отключении** | `hide_when_disconnected` | `bool` | `false` | Скрывать виджет на панели, когда наушники не подключены |
-| **MAC-адрес устройства** | `device_mac` | `string` | `""` | Переопределение MAC-адреса (по умолчанию определяется автоматически) |
+| **Notify on Connect** | `notify_on_connect` | `bool` | `true` | Show popup notification with battery status upon connection |
+| **Hide When Disconnected** | `hide_when_disconnected` | `bool` | `false` | Hide widget from the bar when earbuds are disconnected |
+| **Device MAC Address** | `device_mac` | `string` | `""` | Override Bluetooth MAC address (automatically detected by default) |
 
 ---
 
-## ⌨️ Управление через IPC и Горячие клавиши
+## ⌨️ IPC Commands & Keybindings
 
-Вы можете вызывать действия плагина из терминала, скриптов или привязать их к клавишам в вашем оконном менеджере (например, Hyprland):
+You can trigger plugin actions from a terminal, scripts, or bind them to global shortcuts in your window manager (e.g., Hyprland):
 
 ```bash
-# Переключить режим ANC по кругу (Off -> ANC -> Awareness -> Off)
+# Cycle ANC mode (Off -> ANC -> Awareness -> Off)
 noctalia msg plugin nezerkill/honor-earbuds:service all cycle-noise
 
-# Установить конкретный режим (anc, transparency, off)
+# Set a specific ANC mode (anc, transparency, off)
 noctalia msg plugin nezerkill/honor-earbuds:service all set-noise anc
 
-# Показать уведомление с зарядом аккумулятора
+# Trigger battery status notification
 noctalia msg plugin nezerkill/honor-earbuds:service all notify-battery
 
-# Открыть/закрыть панель управления
+# Toggle dropdown control panel
 noctalia msg panel-toggle nezerkill/honor-earbuds:panel
 ```
 
-### Пример для `hyprland.conf`:
+### Example for `hyprland.conf`:
 
 ```ini
-# Переключение шумоподавления по Super + Alt + N
+# Cycle noise cancellation with Super + Alt + N
 bind = $mainMod ALT, N, exec, noctalia msg plugin nezerkill/honor-earbuds:service all cycle-noise
 
-# Показать заряд наушников по Super + Alt + B
+# Show earbud battery toast with Super + Alt + B
 bind = $mainMod ALT, B, exec, noctalia msg plugin nezerkill/honor-earbuds:service all notify-battery
 ```
 
 ---
 
-## 🛠️ Консольная утилита `honor-anc`
+## 🛠️ Standalone CLI Utility `honor-anc`
 
-В состав также входит отдельный скрипт `scripts/honor-earbuds.py` (симлинк `~/.local/bin/honor-anc`), работающий независимо от графической оболочки:
+The package also includes `scripts/honor-earbuds.py` (symlinked to `~/.local/bin/honor-anc`), which functions independently of any graphical shell:
 
 ```bash
-# Проверить статус подключения, режим ANC и уровень заряда
+# Check connection status, ANC mode, and battery levels
 honor-anc status
 
-# Переключить режим ANC
+# Cycle ANC mode
 honor-anc cycle
 
-# Установить определенный режим
+# Set a specific mode
 honor-anc set anc
 honor-anc set awareness
 honor-anc set off
 
-# Получить заряд в формате JSON
+# Get battery status in JSON format
 honor-anc battery --json
 ```
 
 ---
 
-## 📜 Лицензия
+## 📜 License
 
 MIT License.
