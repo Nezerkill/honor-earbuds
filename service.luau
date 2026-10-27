@@ -140,7 +140,20 @@ noctalia.state.watch(COMMAND_KEY, function(cmdObj)
 	if cmdObj.action == "set-noise" and cmdObj.value and VALID_NOISE_MODES[cmdObj.value] then
 		handleNoiseAction("set-anc", cmdObj.value)
 	elseif cmdObj.action == "cycle-noise" then
-		handleNoiseAction("cycle-anc")
+		-- Calculate next mode locally from snapshot, avoids a second RFCOMM connection
+		local cur = noctalia.state.get(SNAPSHOT_KEY)
+		local curMode = (cur and cur.noise_mode) or "off"
+		local modeOrder = { "off", "anc", "transparency" }
+		local nextMode = "anc"
+		for i, m in ipairs(modeOrder) do
+			if m == curMode then
+				nextMode = modeOrder[(i % #modeOrder) + 1]
+				break
+			end
+		end
+		if VALID_NOISE_MODES[nextMode] then
+			handleNoiseAction("set-anc", nextMode)
+		end
 	elseif cmdObj.action == "refresh" then
 		pollStatus()
 	end
@@ -149,7 +162,19 @@ end)
 -- Handle IPC events
 function onIpc(event, payload)
 	if event == "cycle-noise" then
-		handleNoiseAction("cycle-anc")
+		local cur = noctalia.state.get(SNAPSHOT_KEY)
+		local curMode = (cur and cur.noise_mode) or "off"
+		local modeOrder = { "off", "anc", "transparency" }
+		local nextMode = "anc"
+		for i, m in ipairs(modeOrder) do
+			if m == curMode then
+				nextMode = modeOrder[(i % #modeOrder) + 1]
+				break
+			end
+		end
+		if VALID_NOISE_MODES[nextMode] then
+			handleNoiseAction("set-anc", nextMode)
+		end
 	elseif event == "set-noise" and payload and VALID_NOISE_MODES[payload] then
 		handleNoiseAction("set-anc", payload)
 	elseif event == "notify-battery" then

@@ -194,23 +194,34 @@ class EarbudsClient:
         code = ANC_CODE_MAP.get(mode_str.lower(), 0)
         self.exchange(build_packet(b"\x2b\x04", [(1, bytes([code]))]))
         time.sleep(0.3)  # Give earbuds time to switch mode
-        self.close()  # Fresh socket for status query to avoid stale buffer data
-        return self.get_status()
+        # Don't query status after setting — a second RFCOMM connection right after
+        # the mode switch can confuse the earbuds' audio DSP and cause audio dropout.
+        # The next pollStatus() cycle (2.5s) will pick up the fresh state.
+        return {
+            "connected": True,
+            "noise_mode": ANC_MODES.get(code, "off"),
+            "noise_mode_code": code,
+        }
 
     def cycle_anc(self):
         curr = self.get_status()
         next_code = (curr["noise_mode_code"] + 1) % 3
+        self.close()  # Isolate: fresh connection for the set command
         self.exchange(build_packet(b"\x2b\x04", [(1, bytes([next_code]))]))
         time.sleep(0.3)  # Give earbuds time to switch mode
-        self.close()  # Fresh socket for status query to avoid stale buffer data
-        return self.get_status()
+        return {
+            "connected": True,
+            "noise_mode": ANC_MODES.get(next_code, "off"),
+            "noise_mode_code": next_code,
+        }
 
     def set_eq(self, preset_str: str):
         code = EQ_MAP.get(preset_str.lower(), 0)
         self.exchange(build_packet(b"\x27\x01", [(1, bytes([code]))]))
-        status = self.get_status()
-        status["eq"] = preset_str
-        return status
+        return {
+            "connected": True,
+            "eq": preset_str,
+        }
 
 def main():
     parser = argparse.ArgumentParser()
