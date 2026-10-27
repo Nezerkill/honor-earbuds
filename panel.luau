@@ -164,7 +164,7 @@ local function render()
 				textAlign = "center",
 			}),
 			ui.button({
-				text = "Обновить",
+				text = noctalia.tr("panel.refresh"),
 				glyph = "reload",
 				variant = "primary",
 				onClick = function()

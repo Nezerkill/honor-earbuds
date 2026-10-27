@@ -62,14 +62,19 @@ local function render()
 		bLevel = r
 	end
 
-	if bLevel >= 0 and not barWidget.isVertical() then
-		barWidget.setText(tostring(bLevel) .. "%")
+	if bLevel >= 0 then
+		if barWidget.isVertical() then
+			barWidget.setText(tostring(bLevel) .. "%")
+			barWidget.setGlyphColor(bLevel <= 20 and "error" or "default")
+		else
+			barWidget.setText(tostring(bLevel) .. "%")
+		end
 	else
 		barWidget.setText("")
 	end
 
 	local tooltipRows = {
-		{ key = "Device", value = snapshot.model_name or "Honor Choice Earbuds X5" },
+		{ key = noctalia.tr("panel.title"), value = snapshot.model_name or "Honor Choice Earbuds X5" },
 		{ key = noctalia.tr("widget.mode"), value = getModeName(mode) },
 	}
 
@@ -88,8 +93,8 @@ local function render()
 		table.insert(tooltipRows, { key = noctalia.tr("panel.case"), value = tostring(snapshot.battery_case) .. "%" .. chg })
 	end
 
-	table.insert(tooltipRows, { key = "ЛКМ", value = noctalia.tr("widget.action.left_click") })
-	table.insert(tooltipRows, { key = "ПКМ", value = noctalia.tr("widget.action.right_click") })
+	table.insert(tooltipRows, { key = noctalia.tr("widget.action.left_click_label"), value = noctalia.tr("widget.action.left_click") })
+	table.insert(tooltipRows, { key = noctalia.tr("widget.action.right_click_label"), value = noctalia.tr("widget.action.right_click") })
 
 	barWidget.setTooltip(tooltipRows)
 end
