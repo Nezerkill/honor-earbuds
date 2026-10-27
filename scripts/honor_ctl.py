@@ -192,11 +192,16 @@ class EarbudsClient:
 
     def set_anc(self, mode_str: str):
         code = ANC_CODE_MAP.get(mode_str.lower(), 0)
-        self.exchange(build_packet(b"\x2b\x04", [(1, bytes([code]))]))
-        time.sleep(0.3)  # Give earbuds time to switch mode
-        # Don't query status after setting — a second RFCOMM connection right after
-        # the mode switch can confuse the earbuds' audio DSP and cause audio dropout.
-        # The next pollStatus() cycle (2.5s) will pick up the fresh state.
+        if not self.sock and not self.connect():
+            raise ConnectionError("Disconnected")
+        # Send command and close immediately — don't wait for a response.
+        # The `recv` in exchange() would block for 1.2s, keeping the RFCOMM
+        # socket open. Some earbuds' single-threaded firmware stops processing
+        # audio while the config socket is open.
+        pkt = build_packet(b"\x2b\x04", [(1, bytes([code]))])
+        self.sock.sendall(pkt)
+        self.close()
+        time.sleep(0.5)
         return {
             "connected": True,
             "noise_mode": ANC_MODES.get(code, "off"),
@@ -206,9 +211,13 @@ class EarbudsClient:
     def cycle_anc(self):
         curr = self.get_status()
         next_code = (curr["noise_mode_code"] + 1) % 3
-        self.close()  # Isolate: fresh connection for the set command
-        self.exchange(build_packet(b"\x2b\x04", [(1, bytes([next_code]))]))
-        time.sleep(0.3)  # Give earbuds time to switch mode
+        self.close()
+        if not self.sock and not self.connect():
+            raise ConnectionError("Disconnected")
+        pkt = build_packet(b"\x2b\x04", [(1, bytes([next_code]))])
+        self.sock.sendall(pkt)
+        self.close()
+        time.sleep(0.5)
         return {
             "connected": True,
             "noise_mode": ANC_MODES.get(next_code, "off"),
