@@ -194,6 +194,7 @@ class EarbudsClient:
         code = ANC_CODE_MAP.get(mode_str.lower(), 0)
         self.exchange(build_packet(b"\x2b\x04", [(1, bytes([code]))]))
         time.sleep(0.3)  # Give earbuds time to switch mode
+        self.close()  # Fresh socket for status query to avoid stale buffer data
         return self.get_status()
 
     def cycle_anc(self):
@@ -201,6 +202,7 @@ class EarbudsClient:
         next_code = (curr["noise_mode_code"] + 1) % 3
         self.exchange(build_packet(b"\x2b\x04", [(1, bytes([next_code]))]))
         time.sleep(0.3)  # Give earbuds time to switch mode
+        self.close()  # Fresh socket for status query to avoid stale buffer data
         return self.get_status()
 
     def set_eq(self, preset_str: str):

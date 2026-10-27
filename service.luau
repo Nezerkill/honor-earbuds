@@ -9,6 +9,7 @@ local scriptPath = noctalia.pluginDir() .. "/scripts/honor_ctl.py"
 local wasConnected = false
 local hasNotifiedBattery = false
 local pollInterval = noctalia.getConfig("poll_interval") or 2500
+local isExecuting = false  -- Guard against concurrent RFCOMM connections
 
 -- Allowlist of valid noise modes (prevents shell injection in argv dispatch)
 local VALID_NOISE_MODES = {
@@ -81,6 +82,9 @@ local function updateSnapshot(data)
 end
 
 local function pollStatus()
+	if isExecuting then
+		return
+	end
 	local args = getCliArgs({ "status" })
 	noctalia.runAsync(args, function(result)
 		if result and result.stdout and result.stdout ~= "" then
@@ -103,12 +107,17 @@ local function notifyMode(mode)
 end
 
 local function handleNoiseAction(action, arg)
+	if isExecuting then
+		return
+	end
+	isExecuting = true
 	local extra = { action }
 	if arg then
 		table.insert(extra, tostring(arg))
 	end
 	local args = getCliArgs(extra)
 	noctalia.runAsync(args, function(result)
+		isExecuting = false
 		if result and result.stdout and result.stdout ~= "" then
 			local ok, parsed = pcall(function() return noctalia.json.decode(result.stdout) end)
 			if ok and parsed then
