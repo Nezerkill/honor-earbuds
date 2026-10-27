@@ -194,14 +194,12 @@ class EarbudsClient:
         code = ANC_CODE_MAP.get(mode_str.lower(), 0)
         if not self.sock and not self.connect():
             raise ConnectionError("Disconnected")
-        # Send command and close immediately — don't wait for a response.
-        # The `recv` in exchange() would block for 1.2s, keeping the RFCOMM
-        # socket open. Some earbuds' single-threaded firmware stops processing
-        # audio while the config socket is open.
         pkt = build_packet(b"\x2b\x04", [(1, bytes([code]))])
         self.sock.sendall(pkt)
-        self.close()
-        time.sleep(0.5)
+        # Don't close here — closing immediately can abort RFCOMM transmission.
+        # Don't read either — earbuds may not respond, recv would block 1.2s.
+        # The socket will be closed by main()'s finally block on exit.
+        time.sleep(0.5)  # Give earbuds time to process the command
         return {
             "connected": True,
             "noise_mode": ANC_MODES.get(code, "off"),
