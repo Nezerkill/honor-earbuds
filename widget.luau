@@ -28,7 +28,7 @@ local function render()
 
 	if not connected then
 		barWidget.setGlyph("headphones-off")
-		barWidget.setGlyphColor("outline")
+		barWidget.setGlyphColor("outline_variant")
 		barWidget.setText("")
 		barWidget.setTooltip({
 			{ key = noctalia.tr("panel.title"), value = noctalia.tr("widget.not_connected") },

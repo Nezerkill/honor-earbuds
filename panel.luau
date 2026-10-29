@@ -36,7 +36,7 @@ local function batteryColumn(glyphName, label, level, charging)
 	elseif charging then
 		fillRole = "secondary"
 	elseif not hasLevel then
-		fillRole = "outline"
+		fillRole = "outline_variant"
 	end
 
 	return ui.column({
@@ -48,7 +48,7 @@ local function batteryColumn(glyphName, label, level, charging)
 			ui.glyph({
 				name = glyphName,
 				size = 16,
-				color = hasLevel and "primary" or "outline",
+				color = hasLevel and "primary" or "outline_variant",
 			}),
 			ui.label({
 				text = label,
@@ -154,7 +154,7 @@ local function render()
 			ui.glyph({
 				name = "headphones-off",
 				size = 48,
-				color = "outline",
+				color = "outline_variant",
 			}),
 			ui.label({
 				text = noctalia.tr("widget.not_connected"),
@@ -185,7 +185,7 @@ local function render()
 			ui.glyph({
 				name = "headphones",
 				size = 28,
-				color = connected and "primary" or "outline",
+				color = connected and "primary" or "outline_variant",
 			}),
 			ui.column({ gap = 2 }, {
 				ui.label({
