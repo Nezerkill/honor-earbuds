@@ -18,6 +18,17 @@ local VALID_NOISE_MODES = {
 	["off"] = true,
 }
 
+local function earbudsAvailableForNoise()
+	local cur = noctalia.state.get(SNAPSHOT_KEY)
+	if type(cur) ~= "table" then
+		return true
+	end
+	local function available(level)
+		return level == nil or level > 0
+	end
+	return available(cur.battery_left) and available(cur.battery_right)
+end
+
 local function isNotifyEnabled()
 	return noctalia.getConfig("notify_on_connect") ~= false
 end
@@ -107,7 +118,7 @@ local function notifyMode(mode)
 end
 
 local function handleNoiseAction(action, arg)
-	if isExecuting then
+	if isExecuting or not earbudsAvailableForNoise() then
 		return
 	end
 	isExecuting = true

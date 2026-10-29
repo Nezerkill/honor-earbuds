@@ -11,6 +11,7 @@
     "charging": "Charging",
     "refresh": "Refresh",
     "noise_control": "NOISE CONTROL",
+    "noise_requires_both": "Both earbuds are required to change noise control",
     "mode": {
       "anc": "Noise Cancellation",
       "transparency": "Awareness",

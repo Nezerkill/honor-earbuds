@@ -17,6 +17,13 @@ local function getModeName(mode)
 	return mode or ""
 end
 
+local function availableLevel(value)
+	if type(value) ~= "number" or value <= 0 then
+		return nil
+	end
+	return value
+end
+
 local function render()
 	local connected = snapshot.connected == true
 
@@ -49,25 +56,24 @@ local function render()
 		barWidget.setGlyphColor("default")
 	end
 
-	-- Battery to show on the bar: minimum of available earbuds
-	local bLevel = -1
-	local l = snapshot.battery_left
-	local r = snapshot.battery_right
+	-- Overall earbud battery: ignore an earbud that reports 0 (in the case / off)
+	-- and average the remaining earbuds.
+	local l = availableLevel(snapshot.battery_left)
+	local r = availableLevel(snapshot.battery_right)
 
+	local bLevel = nil
 	if l and r then
-		bLevel = math.min(l, r)
+		bLevel = math.floor((l + r) / 2 + 0.5)
 	elseif l then
 		bLevel = l
 	elseif r then
 		bLevel = r
 	end
 
-	if bLevel >= 0 then
+	if bLevel ~= nil then
+		barWidget.setText(tostring(bLevel) .. "%")
 		if barWidget.isVertical() then
-			barWidget.setText(tostring(bLevel) .. "%")
 			barWidget.setGlyphColor(bLevel <= 20 and "error" or "default")
-		else
-			barWidget.setText(tostring(bLevel) .. "%")
 		end
 	else
 		barWidget.setText("")
@@ -78,14 +84,16 @@ local function render()
 		{ key = noctalia.tr("widget.mode"), value = getModeName(mode) },
 	}
 
-	if l then
+	if snapshot.battery_left ~= nil then
 		local chg = snapshot.charging_left and (" (" .. noctalia.tr("panel.charging") .. ")") or ""
-		table.insert(tooltipRows, { key = noctalia.tr("panel.left"), value = tostring(l) .. "%" .. chg })
+		local value = l ~= nil and (tostring(l) .. "%" .. chg) or noctalia.tr("panel.status.disconnected")
+		table.insert(tooltipRows, { key = noctalia.tr("panel.left"), value = value })
 	end
 
-	if r then
+	if snapshot.battery_right ~= nil then
 		local chg = snapshot.charging_right and (" (" .. noctalia.tr("panel.charging") .. ")") or ""
-		table.insert(tooltipRows, { key = noctalia.tr("panel.right"), value = tostring(r) .. "%" .. chg })
+		local value = r ~= nil and (tostring(r) .. "%" .. chg) or noctalia.tr("panel.status.disconnected")
+		table.insert(tooltipRows, { key = noctalia.tr("panel.right"), value = value })
 	end
 
 	if snapshot.battery_case then
